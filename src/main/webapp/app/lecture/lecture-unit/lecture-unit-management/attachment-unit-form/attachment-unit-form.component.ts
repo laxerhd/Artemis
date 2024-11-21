@@ -68,7 +68,7 @@ export class AttachmentUnitFormComponent implements OnChanges {
     private readonly statusChanges = toSignal(this.form.statusChanges ?? 'INVALID');
 
     isFormValid = computed(() => {
-        return (this.statusChanges() === 'VALID' || this.fileName()) && !this.isFileTooBig();
+        return this.statusChanges() === 'VALID' && !this.isFileTooBig() && this.nameControl?.value != '' && this.fileName();
     });
 
     ngOnChanges(): void {
