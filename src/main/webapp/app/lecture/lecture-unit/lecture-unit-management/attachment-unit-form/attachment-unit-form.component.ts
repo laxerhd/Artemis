@@ -6,6 +6,7 @@ import { ACCEPTED_FILE_EXTENSIONS_FILE_BROWSER, ALLOWED_FILE_EXTENSIONS_HUMAN_RE
 import { CompetencyLectureUnitLink } from 'app/entities/competency.model';
 import { MAX_FILE_SIZE } from 'app/shared/constants/input.constants';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface AttachmentUnitFormData {
     formProperties: FormProperties;
@@ -56,6 +57,7 @@ export class AttachmentUnitFormComponent implements OnChanges {
     fileName = signal<string | undefined>(undefined);
     isFileTooBig = signal<boolean>(false);
 
+    private readonly translateService = inject(TranslateService);
     private readonly formBuilder = inject(FormBuilder);
     form: FormGroup = this.formBuilder.group({
         name: [undefined as string | undefined, [Validators.required, Validators.maxLength(255)]],
@@ -92,6 +94,23 @@ export class AttachmentUnitFormComponent implements OnChanges {
             });
         }
         this.isFileTooBig.set(this.file.size > MAX_FILE_SIZE);
+    }
+
+    get tooltipText(): string | null {
+        if (!this.fileInputTouched && this.nameControl?.invalid) {
+            return (
+                this.translateService.instant('artemisApp.attachmentUnit.createAttachmentUnit.nameRequiredValidationError') +
+                ' ' +
+                this.translateService.instant('artemisApp.attachmentUnit.createAttachmentUnit.fileRequiredValidationError')
+            );
+        }
+        if (!this.fileInputTouched) {
+            return this.translateService.instant('artemisApp.attachmentUnit.createAttachmentUnit.fileRequiredValidationError');
+        }
+        if (this.nameControl?.invalid) {
+            return this.translateService.instant('artemisApp.attachmentUnit.createAttachmentUnit.nameRequiredValidationError');
+        }
+        return null;
     }
 
     get nameControl() {
